@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+
+{% block title %}Clients{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>👥 Clients</h2>
+
+    <a href="{{ url_for('clients.new') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> New Client
+    </a>
+</div>
+
+<form method="GET" class="mb-4">
+
+    <div class="row g-2 align-items-end">
+
+        <div class="col-md-5">
+            <label class="form-label small text-muted">Phone</label>
+            <input type="text"
+                   name="phone"
+                   value="{{ filters.phone or '' }}"
+                   class="form-control"
+                   placeholder="Search by phone">
+        </div>
+
+        <div class="col-md-5">
+            <label class="form-label small text-muted">Email</label>
+            <input type="text"
+                   name="Email"
+                   value="{{ filters.Email or '' }}"
+                   class="form-control"
+                   placeholder="Search by Email">
+        </div>
+
+        <div class="col-md-5">
+            <label class="form-label small text-muted">First Name</label>
+            <input type="text"
+                   name="first_name"
+                   value="{{ filters.first_name or '' }}"
+                   class="form-control"
+                   placeholder="Search by First name">
+        </div>
+
+        <div class="col-md-5">
+            <label class="form-label small text-muted">Last Name</label>
+            <input type="text"
+                   name="last_name"
+                   value="{{ filters.last_name or '' }}"
+                   class="form-control"
+                   placeholder="Search by last name">
+        </div>
+
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-outline-primary">
+                Search
+            </button>
+        </div>
+
+        <a href="{{ url_for('clients.index') }}" class="btn btn-outline-secondary">
+            Clear
+        </a>
+
+    </div>
+
+</form>
+
+<div class="row">
+    {% for client in clients %}
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+
+            <div class="card-header d-flex justify-content-between">
+                <a href="{{ url_for('clients.detail', client_id=client.id) }}"
+                   class="text-decoration-none text-dark fw-bold">
+                {{ client.phone | format_phone }}
+                </a>
+                <span class="text-muted">#{{ client.id }}</span>
+            </div>
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>First Name:</span>
+                    <strong>{{ client.first_name or "No First name provided" }}</strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Last Name:</span>
+                    <strong>{{ client.last_name or "No last name provided" }}</strong>
+                </div>
+                <hr>
+
+                <div class="d-grid mt-2">
+                    <a href="{{ url_for('orders.index', client_id=client.id) }}" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-list-task"></i> List of orders
+                    </a>
+                </div>
+
+                <div class="d-grid mt-2">
+                    <a href="{{ url_for('orders.new', client_id=client.id) }}" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-cart-plus"></i> Create Order
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-muted my-4">
+        No clients found.
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

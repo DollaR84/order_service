@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}Client {{ client.full_name }} ({{ client.id }}){% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-header">
+        <h4>{{ client.phone | format_phone }}</h4>
+    </div>
+
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <strong>First Name:</strong> {{ client.first_name or "No First name provided" }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <strong>Last Name:</strong> {{ client.last_name or "No last name provided" }}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <strong>Email:</strong> {{ client.email or "No email provided" }}
+            </div>
+        </div>
+
+        <hr>
+
+        <small class="text-muted">
+            Created: {{ client.created_at }}
+        </small>
+
+        <br>
+
+        <small class="text-muted">
+            Updated: {{ client.updated_at }}
+        </small>
+        <hr>
+
+        <div class="d-grid mt-2">
+            <a href="{{ url_for('orders.index', client_id=client.id) }}" class="btn btn-sm btn-outline-info">
+            <i class="bi bi-list-task"></i> List of orders
+            </a>
+        </div>
+
+        <div class="d-grid mt-2">
+            <a href="{{ url_for('orders.new', client_id=client.id) }}" class="btn btn-sm btn-outline-success">
+            <i class="bi bi-cart-plus"></i> Create Order
+            </a>
+        </div>
+        <hr>
+
+        <a href="{{ url_for('clients.index') }}" class="btn btn-secondary">
+            Back
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

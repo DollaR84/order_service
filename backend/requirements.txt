@@ -1,0 +1,11 @@
+alembic
+SQLAlchemy
+psycopg2-binary
+asyncpg
+flask[async]
+flask-login
+dishka
+pydantic
+pydantic[email]
+pydantic-settings
+uvicorn

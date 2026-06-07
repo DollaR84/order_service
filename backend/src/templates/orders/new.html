@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}Create Order{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2>🛒 Create New Order</h2>
+    <p class="text-muted">Select a client, products, and specify the quantities for the order.</p>
+</div>
+
+<form method="POST" action="{{ url_for('orders.new') }}">
+    <div class="card p-3 shadow-sm mb-4 bg-light">
+        <label for="client_id" class="form-label fw-bold">👤 Select Client</label>
+        <select name="client_id" id="client_id" class="form-select form-select-lg" required>
+            <option value="" disabled {% if not selected_client_id %}selected{% endif %}>-- Choose a client --</option>
+            {% for client in clients %}
+                <option value="{{ client.id }}" {% if selected_client_id == client.id %}selected{% endif %}>#{{ client.id }}. {{ client.full_name }} ({{ client.phone | format_phone }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <h5 class="fw-bold">📦 Select Products</h5>
+    </div>
+    <div class="row">
+        {% for product in products %}
+        <div class="col-12 mb-2">
+            <div class="card p-3 shadow-sm bot-card">
+                <div class="d-flex justify-content-between align-items-center gap-3">
+                    
+                    <div class="form-check flex-grow-1">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               name="product_{{ product.id }}" 
+                               id="product_{{ product.id }}">
+                        <label class="form-check-label w-100" for="product_{{ product.id }}">
+                            <strong class="d-block">{{ product.name }}</strong>
+                            <span class="text-muted small">
+                                Price: {{ product.price }} | Available Stock: {{ product.stock }}
+                            </span>
+                        </label>
+                    </div>
+
+                    <div style="width: 120px;">
+                        <input type="number" 
+                               name="qty_{{ product.id }}" 
+                               value="1" 
+                               min="1" 
+                               max="{{ product.stock }}"
+                               class="form-control">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-success flex-grow-1 py-2">
+            <i class="bi bi-check-circle"></i> Place Order
+        </button>
+        <a href="{{ url_for('orders.index') }}" class="btn btn-secondary py-2">Cancel</a>
+    </div>
+</form>
+{% endblock %}

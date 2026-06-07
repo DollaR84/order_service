@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}Product {{ product.name }} ({{ product.id }}){% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-header">
+        <h4>{{ product.name }}</h4>
+    </div>
+
+    <div class="card-body">
+
+        <p>{{ product.description or "No description" }}</p>
+
+        <hr>
+
+        <div class="row">
+            <div class="col">
+                <strong>Price:</strong> {{ product.price }}
+            </div>
+
+            <div class="col">
+                <strong>Stock:</strong> {{ product.stock }}
+            </div>
+        </div>
+
+        <hr>
+
+        <small class="text-muted">
+            Created: {{ product.created_at }}
+        </small>
+
+        <br>
+
+        <small class="text-muted">
+            Updated: {{ product.updated_at }}
+        </small>
+
+        <hr>
+
+        <a href="{{ url_for('products.index') }}" class="btn btn-secondary">
+            Back
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
