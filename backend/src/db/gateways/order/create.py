@@ -18,6 +18,7 @@ class CreateOrderGateway(BaseGateway[int, Order]):
         select_stmt = (
             select(Product.id, Product.price, Product.stock)
             .where(Product.id.in_(product_ids))
+            .with_for_update()
         )
         result = await self.session.execute(select_stmt)
 
