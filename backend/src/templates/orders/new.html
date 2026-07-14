@@ -81,16 +81,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalElement = document.getElementById('live-total');
 
     function calculateTotal() {
-        let total = 0;
+        let totalInCents = 0;
         document.querySelectorAll('.product-selector:checked').forEach(checkbox => {
             const productId = checkbox.dataset.id;
-            const price = parseFloat(checkbox.dataset.price) || 0;
+            const priceFloat = parseFloat(checkbox.dataset.price) || 0;
+            const priceInCents = Math.round(priceFloat * 100);
+
             const qtyInput = document.getElementById(`qty_${productId}`);
             const quantity = parseInt(qtyInput.value) || 1;
-            total += price * quantity;
+            totalInCents += priceInCents * quantity;
         });
 
-        totalElement.textContent = total.toFixed(2);
+        const finalTotal = totalInCents / 100;
+        const roundedTotal = Math.round((finalTotal + Number.EPSILON) * 100) / 100;
+        totalElement.textContent = roundedTotal.toFixed(2);
     }
 
     document.querySelectorAll('.product-selector').forEach(checkbox => {
