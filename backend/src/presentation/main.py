@@ -13,7 +13,11 @@ class FlaskApp:
 
     def __init__(self, config: Config):
         self.config = config.flask
-        self._app = Flask(__name__, template_folder=self.config.templates_dir)
+        self._app = Flask(
+            __name__,
+            template_folder=self.config.templates_dir,
+            static_folder=self.config.static_dir,
+        )
 
         self._app.config.from_object(self.config)
         self._app.jinja_env.filters["format_phone"] = format_phone

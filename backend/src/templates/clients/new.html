@@ -15,7 +15,7 @@
 
             <div class="card-body">
 
-                <form method="POST">
+                <form method="POST" action="{{ url_for('clients.new') }}" class="ajax-form">
 
                     <div class="mb-3">
                         <label class="form-label">First Name</label>
@@ -60,10 +60,12 @@
 <script src="https://unpkg.com/imask"></script>
 <script>
     const element = document.getElementById('phone-input');
-    const maskOptions = {
-        mask: '+38 (000) 000-00-00',
-        lazy: false
-    };
-    const mask = IMask(element, maskOptions);
+    if (element) {
+        const maskOptions = {
+            mask: '+38 (000) 000-00-00',
+            lazy: false
+        };
+        const mask = IMask(element, maskOptions);
+    }
 </script>
 {% endblock %}

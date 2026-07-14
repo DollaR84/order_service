@@ -32,6 +32,7 @@ class DBConfig(BaseModel):
 
 class FlaskConfig(BaseModel):
     templates_dir: Path
+    static_dir: Path
 
 
 class AdminConfig(BaseModel):

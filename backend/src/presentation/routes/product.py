@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
+from flask import Blueprint, flash, redirect, render_template, url_for, jsonify, request
 from flask.views import MethodView
 from flask.typing import ResponseReturnValue
 from flask_login import login_required
@@ -46,9 +46,12 @@ class CreateProductView(MethodView):
     @login_required
     @inject
     async def post(self, creator: FromDishka[interactors.CreateProduct]) -> ResponseReturnValue:
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
         try:
             data = parse_request(schemas.CreateProductSchema)
         except ValueError as e:
+            if is_ajax:
+                return jsonify({"status": "error", "message": f"Validation error: {e}"}), 400
             flash(f"Validation error: {e}", "danger")
             return redirect(url_for("products.new"))
 
@@ -62,9 +65,16 @@ class CreateProductView(MethodView):
             product_id = await creator(product)
 
             flash("Product created successfully", "success")
+            if is_ajax:
+                return jsonify({
+                    "status": "success",
+                    "redirect_url": url_for("products.detail", product_id=product_id)
+                }), 201
             return redirect(url_for("products.detail", product_id=product_id))
 
         except Exception:
+            if is_ajax:
+                return jsonify({"status": "error", "message": "Invalid product data"}), 422
             flash("Invalid product data", "danger")
             return redirect(url_for("products.new"))
 

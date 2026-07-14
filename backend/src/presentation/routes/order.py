@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
+from flask import Blueprint, flash, redirect, render_template, url_for, jsonify, request
 from flask.typing import ResponseReturnValue
 from flask.views import MethodView
 from flask_login import login_required
@@ -59,10 +59,14 @@ class CreateOrderFormView(MethodView):
     @login_required
     @inject
     async def post(self, creator: FromDishka[interactors.CreateOrder]) -> ResponseReturnValue:
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
         try:
             data = parse_request(schemas.CreateOrderSchema)
         except ValueError as e:
-            flash(f"Please select at client or least one product with a valid quantity.\n{e}", "danger")
+            error_msg = f"Please select at client or least one product with a valid quantity.\n{e}"
+            if is_ajax:
+                return jsonify({"status": "error", "message": error_msg}), 400
+            flash(error_msg, "danger")
             return redirect(url_for("orders.new"))
 
         order_data = dto.NewOrder(
@@ -77,14 +81,25 @@ class CreateOrderFormView(MethodView):
             await creator(order_data)
 
             flash("Order created successfully!", "success")
+            if is_ajax:
+                return jsonify({
+                    "status": "success",
+                    "redirect_url": url_for("orders.index")
+                }), 201
             return redirect(url_for("orders.index"))
 
         except NotEnoughStockError as e:
-            flash(f"Failed to process order: {e}", "danger")
+            error_msg = f"Failed to process order: {e}"
+            if is_ajax:
+                return jsonify({"status": "error", "message": error_msg}), 409
+            flash(error_msg, "danger")
             return redirect(url_for("orders.new"))
 
         except Exception:
-            flash("Something went wrong on the server", "danger")
+            error_msg = "Something went wrong on the server"
+            if is_ajax:
+                return jsonify({"status": "error", "message": error_msg}), 500
+            flash(error_msg, "danger")
             return redirect(url_for("orders.new"))
 
 

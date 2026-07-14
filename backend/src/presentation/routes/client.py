@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, url_for
+from flask import Blueprint, flash, redirect, render_template, url_for, jsonify, request
 from flask.views import MethodView
 from flask.typing import ResponseReturnValue
 from flask_login import login_required
@@ -50,9 +50,12 @@ class CreateClientView(MethodView):
     @login_required
     @inject
     async def post(self, creator: FromDishka[interactors.CreateClient]) -> ResponseReturnValue:
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
         try:
             data = parse_request(schemas.CreateClientSchema)
         except ValueError as e:
+            if is_ajax:
+                return jsonify({"status": "error", "message": f"Validation error: {e}"}), 400
             flash(f"Validation error: {e}", "danger")
             return redirect(url_for("clients.new"))
 
@@ -66,9 +69,16 @@ class CreateClientView(MethodView):
             client_id = await creator(client)
 
             flash("Client created successfully", "success")
+            if is_ajax:
+                return jsonify({
+                    "status": "success",
+                    "redirect_url": url_for("clients.detail", client_id=client_id)
+                }), 201
             return redirect(url_for("clients.detail", client_id=client_id))
 
         except Exception:
+            if is_ajax:
+                return jsonify({"status": "error", "message": "Invalid client data"}), 422
             flash("Invalid client data", "danger")
             return redirect(url_for("clients.new"))
 

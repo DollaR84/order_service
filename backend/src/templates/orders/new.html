@@ -8,7 +8,7 @@
     <p class="text-muted">Select a client, products, and specify the quantities for the order.</p>
 </div>
 
-<form method="POST" action="{{ url_for('orders.new') }}">
+<form method="POST" action="{{ url_for('orders.new') }}" class="ajax-form">
     <div class="card p-3 shadow-sm mb-4 bg-light">
         <label for="client_id" class="form-label fw-bold">👤 Select Client</label>
         <select name="client_id" id="client_id" class="form-select form-select-lg" required>
@@ -29,10 +29,12 @@
                 <div class="d-flex justify-content-between align-items-center gap-3">
                     
                     <div class="form-check flex-grow-1">
-                        <input class="form-check-input" 
+                        <input class="form-check-input product-selector" 
                                type="checkbox" 
                                name="product_{{ product.id }}" 
-                               id="product_{{ product.id }}">
+                               id="product_{{ product.id }}"
+                               data-id="{{ product.id }}"
+                               data-price="{{ product.price }}">
                         <label class="form-check-label w-100" for="product_{{ product.id }}">
                             <strong class="d-block">{{ product.name }}</strong>
                             <span class="text-muted small">
@@ -43,17 +45,25 @@
 
                     <div style="width: 120px;">
                         <input type="number" 
-                               name="qty_{{ product.id }}" 
-                               value="1" 
-                               min="1" 
+                               name="qty_{{ product.id }}"
+                               id="qty_{{ product.id }}"
+                               value="1"
+                               min="1"
                                max="{{ product.stock }}"
-                               class="form-control">
+                               class="form-control qty-input">
                     </div>
 
                 </div>
             </div>
         </div>
         {% endfor %}
+    </div>
+
+    <div class="card p-3 shadow-sm mb-4 bg-dark text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Total amount order:</h4>
+            <h3 class="mb-0 text-success fw-bold" id="live-total">0.00</h3>
+        </div>
     </div>
 
     <div class="mt-4 d-flex gap-2">
@@ -63,4 +73,33 @@
         <a href="{{ url_for('orders.index') }}" class="btn btn-secondary py-2">Cancel</a>
     </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const totalElement = document.getElementById('live-total');
+
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.product-selector:checked').forEach(checkbox => {
+            const productId = checkbox.dataset.id;
+            const price = parseFloat(checkbox.dataset.price) || 0;
+            const qtyInput = document.getElementById(`qty_${productId}`);
+            const quantity = parseInt(qtyInput.value) || 1;
+            total += price * quantity;
+        });
+
+        totalElement.textContent = total.toFixed(2);
+    }
+
+    document.querySelectorAll('.product-selector').forEach(checkbox => {
+        checkbox.addEventListener('change', calculateTotal);
+    });
+
+    document.querySelectorAll('.qty-input').forEach(input => {
+        input.addEventListener('input', calculateTotal);
+    });
+});
+</script>
 {% endblock %}
